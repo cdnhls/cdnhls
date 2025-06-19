@@ -1,97 +1,114 @@
-<!DOCTYPE html>
-<html lang="tr">
+<!DOCTYPE html><html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>VolkanTR | CDN | HLS</title>
   <style>
     body {
       margin: 0;
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
+      padding: 0;
       background: linear-gradient(to bottom right, #0f2027, #203a43, #2c5364);
-      height: 100vh;
       color: white;
+      font-family: 'Segoe UI', sans-serif;
       text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100vh;
     }
-
-    .play-icon {
+    .play-button {
       width: 100px;
       height: 100px;
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255,255,255,0.2);
       border-radius: 50%;
       display: flex;
-      justify-content: center;
       align-items: center;
-      margin-bottom: 20px;
-      transition: transform 0.3s ease;
+      justify-content: center;
+      margin: 0 auto 20px auto;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .play-button:hover {
+      background: rgba(255,255,255,0.4);
+    }
+    .play-button svg {
+      width: 40px;
+      height: 40px;
+      fill: white;
+    }
+    .video-modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.9);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    .video-modal video {
+      max-width: 90%;
+      max-height: 90%;
+    }
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 30px;
+      color: white;
       cursor: pointer;
     }
-
-    .play-icon:hover {
-      transform: scale(1.1);
-    }
-
-    .play-icon::before {
-      content: "";
-      display: block;
-      width: 0;
-      height: 0;
-      border-left: 25px solid white;
-      border-top: 15px solid transparent;
-      border-bottom: 15px solid transparent;
-    }
-
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 10px;
-    }
-
-    p {
-      font-size: 1.2rem;
-      color: #d3d3d3;
-      margin-bottom: 40px;
-    }
-
     .telegram-button {
-      display: inline-flex;
-      align-items: center;
+      margin-top: 40px;
       background-color: #0088cc;
       color: white;
       border: none;
-      padding: 14px 24px;
-      border-radius: 30px;
-      font-size: 1rem;
+      padding: 15px 25px;
+      font-size: 18px;
+      border-radius: 8px;
       text-decoration: none;
-      transition: background 0.3s ease;
-      position: absolute;
-      bottom: 30px;
-    }
-
-    .telegram-button:hover {
-      background-color: #0077b3;
-    }
-
-    .telegram-button svg {
-      margin-right: 10px;
+      display: inline-block;
     }
   </style>
 </head>
 <body>
+  <div class="play-button" onclick="openVideo()">
+    <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+  </div>
+  <h1>VolkanTR HLS</h1>
+  <p>Farklılık Yaratmaya Hazır mısın!</p>  <a class="telegram-button" href="https://t.me/VTRvolkan" target="_blank">
+    📲 Telegram
+  </a>  <!-- Video Modal -->  <div class="video-modal" id="videoModal">
+    <div class="close-btn" onclick="closeVideo()">✖</div>
+    <video id="player" controls autoplay></video>
+  </div>  <!-- hls.js -->  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>  <script>
+    const videoLink = "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8";
 
-  <div class="play-icon" title="VolkanTR HLS!"></div>
+    function openVideo() {
+      const modal = document.getElementById('videoModal');
+      const video = document.getElementById('player');
 
-  <h1>VolkanTR CDN HLS</h1>
+      if (Hls.isSupported() && videoLink.endsWith(".m3u8")) {
+        const hls = new Hls();
+        hls.loadSource(videoLink);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED, function() {
+          video.play();
+        });
+      } else {
+        video.src = videoLink;
+        video.play();
+      }
 
-  <a class="telegram-button" href="https://t.me/VTRvolkan" target="_blank">
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" viewBox="0 0 24 24">
-      <path d="M9.99 14.72l-.4 3.44c.58 0 .83-.24 1.15-.53l2.75-2.56 5.7 4.17c1.04.58 1.8.27 2.07-.96L24 2.87c.3-1.44-.52-2-1.47-1.65L1.3 9.54c-1.4.54-1.38 1.31-.24 1.66l5.8 1.81 13.46-8.48c.63-.39 1.22-.17.74.25l-10.06 9.94z"/>
-    </svg>
-    Telegram
-  </a>
+      modal.style.display = "flex";
+    }
 
-</body>
+    function closeVideo() {
+      const modal = document.getElementById('videoModal');
+      const video = document.getElementById('player');
+      modal.style.display = "none";
+      video.pause();
+      video.src = "";
+    }
+  </script></body>
 </html>
